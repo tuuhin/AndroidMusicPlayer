@@ -15,26 +15,57 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
+val DarkColorScheme =
+    darkColorScheme(
+        primary = DarkPrimary,
+        secondary = DarkSecondary,
+        tertiary = DarkTertiary,
+        error = DarkError,
+        background = DarkBackGround,
+        surface = DarkSurface,
+        surfaceVariant = DarkSurfaceVariant,
+        outline = DarkOutlined,
+        onBackground = DarkOnBackGround,
+        onPrimary = DarkOnPrimary,
+        onSecondary = DarkOnSecondary,
+        onTertiary = DarkOnTertiary,
+        primaryContainer = DarkPrimaryContainer,
+        onPrimaryContainer = DarkOnPrimaryContainer,
+        secondaryContainer = DarkSecondaryContainer,
+        onSecondaryContainer = DarkOnSecondaryContainer,
+        tertiaryContainer = DarkTertiaryContainer,
+        onTertiaryContainer = DarkOnTertiaryContainer,
+        errorContainer = DarkErrorContainer,
+        onErrorContainer = DarkOnErrorContainer,
+        onError = DarkOnError,
+        onSurface = DarkOnSurface,
+        onSurfaceVariant = DarkOnSurfaceVariant
+    )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+val LightColorScheme = lightColorScheme(
+    primary = LightPrimary,
+    secondary = LightSecondary,
+    tertiary = LightTertiary,
+    error = LightError,
+    background = LightBackGround,
+    surface = LightSurface,
+    surfaceVariant = LightSurfaceVariant,
+    outline = LightOutlined,
+    onBackground = LightOnBackGround,
+    onPrimary = LightOnPrimary,
+    onSecondary = LightOnSecondary,
+    onTertiary = LightOnTertiary,
+    primaryContainer = LightPrimaryContainer,
+    onPrimaryContainer = LightOnPrimaryContainer,
+    secondaryContainer = LightSecondaryContainer,
+    onSecondaryContainer = LightOnSecondaryContainer,
+    tertiaryContainer = LightTertiaryContainer,
+    onTertiaryContainer = LightOnTertiaryContainer,
+    errorContainer = LightErrorContainer,
+    onErrorContainer = LightOnErrorContainer,
+    onError = LightOnError,
+    onSurface = LightOnSurface,
+    onSurfaceVariant = LightOnSurfaceVariant
 )
 
 @Composable
@@ -57,8 +88,8 @@ fun MusicPlayerTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            window.statusBarColor = colorScheme.surfaceVariant.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 
