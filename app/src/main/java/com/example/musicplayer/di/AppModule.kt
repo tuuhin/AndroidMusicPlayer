@@ -13,10 +13,13 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object MusicModule {
+object AppModule {
 
     @Provides
     @Singleton
-    fun musicFileReader(@ApplicationContext context: Context): MusicFileReader =
-        MusicFileReaderImpl(context)
+    fun musicFileReader(
+        @ApplicationContext context: Context
+    ): MusicFileReader {
+        return MusicFileReaderImpl(context)
+    }
 }
