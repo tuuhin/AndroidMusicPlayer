@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MusicPlayer</string>
+    <string name="no_read_desc">There is no read audio files permission provided to this app,make sure this permission is provided,as this is the core feature of this app</string>
+    <string name="no_read_title">Cannot Read audio files</string>
 </resources>

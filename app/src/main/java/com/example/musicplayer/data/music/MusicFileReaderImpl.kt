@@ -10,7 +10,7 @@ import androidx.core.content.PermissionChecker
 import androidx.core.database.getStringOrNull
 import com.example.musicplayer.domain.models.MusicResourceModel
 import com.example.musicplayer.domain.music.MusicFileReader
-import com.example.musicplayer.utils.NoReadPermissions
+import com.example.musicplayer.utils.NoReadPermissionsException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -38,7 +38,7 @@ class MusicFileReaderImpl(
             val musicFiles = mutableListOf<MusicResourceModel>()
 
             try {
-                if (!readAudioFilesPermission) throw NoReadPermissions()
+                if (!readAudioFilesPermission) throw NoReadPermissionsException()
 
                 val volumeUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
                     MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
@@ -85,6 +85,8 @@ class MusicFileReaderImpl(
                         val albumColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
                         val durationColumn =
                             cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+                        val dateAddedColumn =
+                            cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
 
                         while (cursor.moveToNext()) {
 
@@ -100,10 +102,7 @@ class MusicFileReaderImpl(
                             val duration = cursor.getLong(durationColumn)
                             val uriString = ContentUris.withAppendedId(volumeUri, id).toString()
 
-//                            metadataRetriever.setDataSource(
-//                                context,
-//                                ContentUris.withAppendedId(volumeUri, id)
-//                            )
+                            val dateAdded = cursor.getLong(dateAddedColumn)
 
                             musicFiles.add(
                                 MusicResourceModel(
@@ -114,6 +113,8 @@ class MusicFileReaderImpl(
                                     album = album,
                                     duration = duration,
                                     uri = uriString,
+                                    albumArt = null,
+                                    createdAt = dateAdded
                                 )
                             )
                         }

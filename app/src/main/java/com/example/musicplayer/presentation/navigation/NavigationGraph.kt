@@ -1,6 +1,5 @@
 package com.example.musicplayer.presentation.navigation
 
-import android.net.Uri
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -18,7 +17,6 @@ import androidx.navigation.navArgument
 import com.example.musicplayer.presentation.routes.AudioFilesRoute
 import com.example.musicplayer.presentation.routes.AudioFilesViewModel
 import com.example.musicplayer.presentation.routes.PlaySongRoute
-import com.example.musicplayer.presentation.routes.PlaySongsViewModel
 
 @Composable
 fun NavigationGraph(
@@ -34,12 +32,17 @@ fun NavigationGraph(
         composable(route = Screens.HomeRoute.route) {
             val viewModel = hiltViewModel<AudioFilesViewModel>()
             val files by viewModel.audioFiles.collectAsStateWithLifecycle()
+            val currentSelectedSong by viewModel.currentSelectedSong.collectAsStateWithLifecycle()
+            val sortOrder by viewModel.sortOrder.collectAsStateWithLifecycle()
+            val isDialogOpen by viewModel.isDialogOpen.collectAsStateWithLifecycle()
+
             AudioFilesRoute(
+                currentSelectedSong = currentSelectedSong,
                 music = files,
-                onItemSelect = { uri ->
-                    val encodedUri = Uri.parse(uri)
-                    viewModel.playSong(encodedUri)
-                }
+                sortOrder = sortOrder,
+                isDialogOpen = isDialogOpen,
+                onSortEvents = viewModel::onSortEvents,
+                onItemSelect = viewModel::onSongSelect
             )
         }
         composable(
@@ -50,8 +53,6 @@ fun NavigationGraph(
                 }
             )
         ) {
-            val viewModel = hiltViewModel<PlaySongsViewModel>()
-
             PlaySongRoute(
                 onNavigation = {
                     IconButton(
