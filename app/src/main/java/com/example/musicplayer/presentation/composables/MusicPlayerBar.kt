@@ -32,12 +32,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.musicplayer.domain.models.MusicResourceModel
+import com.example.musicplayer.presentation.util.SelectSongEvents
 import com.example.musicplayer.presentation.util.SelectedSongState
 import com.example.musicplayer.presentation.util.SongPreviewParameters
 
 @Composable
 fun MusicPlayerBar(
-    onPlayPause: () -> Unit,
+    onPlayPause: (SelectSongEvents) -> Unit,
     currentSelectedSong: SelectedSongState,
     modifier: Modifier = Modifier,
     containerColor: Color = MaterialTheme.colorScheme.inverseOnSurface,
@@ -102,7 +103,7 @@ fun MusicPlayerBar(
             }
         }
         IconButton(
-            onClick = onPlayPause,
+            onClick = { onPlayPause(SelectSongEvents.ToggleIsPlaying) },
             colors = IconButtonDefaults
                 .outlinedIconButtonColors(contentColor = contentColor),
             modifier = Modifier.padding(horizontal = 8.dp)

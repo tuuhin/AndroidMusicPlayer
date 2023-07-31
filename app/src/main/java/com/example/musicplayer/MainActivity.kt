@@ -8,8 +8,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.media3.session.MediaController
-import com.example.musicplayer.presentation.navigation.NavigationGraph
 import com.example.musicplayer.presentation.composables.NoReadPermissions
+import com.example.musicplayer.presentation.navigation.NavigationGraph
 import com.example.musicplayer.presentation.util.checkAudioReadPermissions
 import com.example.musicplayer.ui.theme.MusicPlayerTheme
 import com.google.common.util.concurrent.ListenableFuture
@@ -20,9 +20,14 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+
     @Inject
     lateinit var listenableFuture: ListenableFuture<MediaController>
 
+    override fun onStop() {
+        MediaController.releaseFuture(listenableFuture)
+        super.onStop()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,8 +38,11 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    val isReadPermissionProvided = checkAudioReadPermissions()
+
                     when {
-                        checkAudioReadPermissions() -> NavigationGraph()
+                        isReadPermissionProvided -> NavigationGraph()
+
                         else -> NoReadPermissions()
                     }
                 }

@@ -17,6 +17,7 @@ import androidx.navigation.navArgument
 import com.example.musicplayer.presentation.routes.AudioFilesRoute
 import com.example.musicplayer.presentation.routes.AudioFilesViewModel
 import com.example.musicplayer.presentation.routes.PlaySongRoute
+import com.example.musicplayer.presentation.routes.SongPlayerSharedViewModel
 
 @Composable
 fun NavigationGraph(
@@ -24,17 +25,21 @@ fun NavigationGraph(
 ) {
     val navHost = rememberNavController()
 
+    val sharedViewModel = hiltViewModel<SongPlayerSharedViewModel>()
+
     NavHost(
         navController = navHost,
         startDestination = Screens.HomeRoute.route,
         modifier = modifier
     ) {
+
         composable(route = Screens.HomeRoute.route) {
             val viewModel = hiltViewModel<AudioFilesViewModel>()
             val files by viewModel.audioFiles.collectAsStateWithLifecycle()
-            val currentSelectedSong by viewModel.currentSelectedSong.collectAsStateWithLifecycle()
             val sortOrder by viewModel.sortOrder.collectAsStateWithLifecycle()
             val isDialogOpen by viewModel.isDialogOpen.collectAsStateWithLifecycle()
+
+            val currentSelectedSong by sharedViewModel.currentSelectedSong.collectAsStateWithLifecycle()
 
             AudioFilesRoute(
                 currentSelectedSong = currentSelectedSong,
@@ -42,7 +47,8 @@ fun NavigationGraph(
                 sortOrder = sortOrder,
                 isDialogOpen = isDialogOpen,
                 onSortEvents = viewModel::onSortEvents,
-                onItemSelect = viewModel::onSongSelect
+                onItemSelect = sharedViewModel::onSongSelect,
+                onPlayEvents = sharedViewModel::onPlaySongEvents
             )
         }
         composable(

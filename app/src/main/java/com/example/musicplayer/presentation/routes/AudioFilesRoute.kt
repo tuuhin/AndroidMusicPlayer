@@ -34,6 +34,7 @@ import com.example.musicplayer.presentation.composables.MusicPlayerBar
 import com.example.musicplayer.presentation.composables.MusicSortOptions
 import com.example.musicplayer.presentation.util.FakeMusicModels
 import com.example.musicplayer.presentation.util.MusicSortOrder
+import com.example.musicplayer.presentation.util.SelectSongEvents
 import com.example.musicplayer.presentation.util.SelectedSongState
 import com.example.musicplayer.presentation.util.SortOrderChangeEvents
 
@@ -49,6 +50,7 @@ fun AudioFilesRoute(
     currentSelectedSong: SelectedSongState,
     music: List<MusicResourceModel>,
     onItemSelect: (MusicResourceModel) -> Unit,
+    onPlayEvents: (SelectSongEvents) -> Unit,
     density: Density = LocalDensity.current
 ) {
     Scaffold(
@@ -84,7 +86,7 @@ fun AudioFilesRoute(
             ) {
                 MusicPlayerBar(
                     currentSelectedSong = currentSelectedSong,
-                    onPlayPause = {},
+                    onPlayPause = onPlayEvents,
                 )
             }
         }
@@ -133,7 +135,10 @@ fun AudioFilesRoutePreview() {
         onItemSelect = {},
         sortOrder = MusicSortOrder.CreatedAtDescending,
         isDialogOpen = false,
-        onSortEvents = {}
+        onSortEvents = {},
+        onPlayEvents = {
+
+        }
     )
 
 }

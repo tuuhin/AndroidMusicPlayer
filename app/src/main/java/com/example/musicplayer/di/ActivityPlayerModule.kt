@@ -38,12 +38,4 @@ object ActivityPlayerModule {
             .buildAsync()
     }
 
-    @Provides
-    @ActivityRetainedScoped
-    fun getController(
-        listenableFuture: ListenableFuture<MediaController>
-    ): MediaController {
-        return listenableFuture.get()
-    }
-
 }

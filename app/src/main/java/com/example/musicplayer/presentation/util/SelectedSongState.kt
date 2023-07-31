@@ -7,3 +7,8 @@ data class SelectedSongState(
     val isPlaying: Boolean = false,
     val current: MusicResourceModel? = null,
 )
+
+sealed interface SelectSongEvents {
+    object ToggleIsPlaying : SelectSongEvents
+
+}

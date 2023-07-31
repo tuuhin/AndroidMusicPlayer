@@ -1,16 +1,13 @@
 package com.example.musicplayer.presentation.routes
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.session.MediaController
 import com.example.musicplayer.domain.models.MusicResourceModel
 import com.example.musicplayer.domain.music.MusicFileReader
 import com.example.musicplayer.presentation.util.MusicSortOrder
-import com.example.musicplayer.presentation.util.SelectedSongState
 import com.example.musicplayer.presentation.util.SortOrderChangeEvents
-import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -20,14 +17,10 @@ import javax.inject.Inject
 @HiltViewModel
 class AudioFilesViewModel @Inject constructor(
     private val reader: MusicFileReader,
-    private val controller: ListenableFuture<MediaController>
 ) : ViewModel() {
 
     private val _files = MutableStateFlow<List<MusicResourceModel>>(emptyList())
     val audioFiles = _files.asStateFlow()
-
-    private val _currentSelectedSong = MutableStateFlow(SelectedSongState())
-    val currentSelectedSong = _currentSelectedSong.asStateFlow()
 
     private val _sortOrder = MutableStateFlow(MusicSortOrder.CreatedAtDescending)
     val sortOrder = _sortOrder.asStateFlow()
@@ -72,33 +65,10 @@ class AudioFilesViewModel @Inject constructor(
     }
 
     private fun loadFiles() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val files = reader.readMusicFiles()
             _files.update { files }
         }
-    }
-
-    fun onSongSelect(model: MusicResourceModel?) {
-        _currentSelectedSong.update {
-            it.copy(
-                isPlaying = true,
-                current = model,
-                showBottomBar = true
-            )
-        }
-    }
-
-    fun playSong(uri: Uri) {
-//        controller.get().apply {
-//            val mediaItem = MediaItem.Builder()
-//                .setMediaId(uri.toString())
-//                .setUri(uri)
-//                .build()
-//            prepare()
-//            setMediaItem(mediaItem)
-//            setMediaItem(mediaItem)
-//            play()
-//        }
     }
 
 }
