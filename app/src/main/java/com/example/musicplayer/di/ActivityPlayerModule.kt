@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
+import com.example.musicplayer.data.player.MediaControllerListener
 import com.example.musicplayer.data.player.MediaPlayBackService
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.Module
@@ -38,4 +39,11 @@ object ActivityPlayerModule {
             .buildAsync()
     }
 
+    @Provides
+    @ActivityRetainedScoped
+    fun providesListener(
+        future: ListenableFuture<MediaController>
+    ): MediaControllerListener {
+        return MediaControllerListener(future)
+    }
 }

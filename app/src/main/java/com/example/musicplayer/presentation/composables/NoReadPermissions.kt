@@ -1,5 +1,6 @@
 package com.example.musicplayer.presentation.composables
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.musicplayer.R
+import com.example.musicplayer.ui.theme.MusicPlayerTheme
 
 @Composable
 fun NoReadPermissions(
@@ -53,9 +55,14 @@ fun NoReadPermissions(
 }
 
 @Preview
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
+)
 @Composable
 fun NoReadPermissionPreview() {
-    Surface(color = MaterialTheme.colorScheme.background) {
-        NoReadPermissions()
+    MusicPlayerTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            NoReadPermissions()
+        }
     }
 }

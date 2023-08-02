@@ -1,5 +1,6 @@
 package com.example.musicplayer.presentation.navigation
 
+import android.net.Uri
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -17,7 +18,7 @@ import androidx.navigation.navArgument
 import com.example.musicplayer.presentation.routes.AudioFilesRoute
 import com.example.musicplayer.presentation.routes.AudioFilesViewModel
 import com.example.musicplayer.presentation.routes.PlaySongRoute
-import com.example.musicplayer.presentation.routes.SongPlayerSharedViewModel
+import com.example.musicplayer.presentation.routes.SharedSongPlayerViewModel
 
 @Composable
 fun NavigationGraph(
@@ -25,30 +26,33 @@ fun NavigationGraph(
 ) {
     val navHost = rememberNavController()
 
-    val sharedViewModel = hiltViewModel<SongPlayerSharedViewModel>()
+    val sharedViewModel = hiltViewModel<SharedSongPlayerViewModel>()
+
+    val currentSelectedSong by sharedViewModel.currentSelectedSong.collectAsStateWithLifecycle()
 
     NavHost(
         navController = navHost,
         startDestination = Screens.HomeRoute.route,
         modifier = modifier
     ) {
-
         composable(route = Screens.HomeRoute.route) {
-            val viewModel = hiltViewModel<AudioFilesViewModel>()
-            val files by viewModel.audioFiles.collectAsStateWithLifecycle()
-            val sortOrder by viewModel.sortOrder.collectAsStateWithLifecycle()
-            val isDialogOpen by viewModel.isDialogOpen.collectAsStateWithLifecycle()
 
-            val currentSelectedSong by sharedViewModel.currentSelectedSong.collectAsStateWithLifecycle()
+            val viewModel = hiltViewModel<AudioFilesViewModel>()
+
+            val files by viewModel.audioFiles.collectAsStateWithLifecycle()
+            val sortState by viewModel.sortState.collectAsStateWithLifecycle()
 
             AudioFilesRoute(
-                currentSelectedSong = currentSelectedSong,
+                currentSong = currentSelectedSong,
                 music = files,
-                sortOrder = sortOrder,
-                isDialogOpen = isDialogOpen,
+                sortState = sortState,
                 onSortEvents = viewModel::onSortEvents,
                 onItemSelect = sharedViewModel::onSongSelect,
-                onPlayEvents = sharedViewModel::onPlaySongEvents
+                onSongEvents = sharedViewModel::onPlaySongEvents,
+                onDetailsRoute = { uri ->
+                    val encodedUri = Uri.encode(uri)
+                    navHost.navigate(ScreenConstants.SONG_ROUTE_URL + encodedUri)
+                }
             )
         }
         composable(
@@ -56,9 +60,13 @@ fun NavigationGraph(
             arguments = listOf(
                 navArgument(ScreenConstants.PLAY_SONG_ROUTE_PARAM) {
                     type = NavType.StringType
+                    nullable = true
                 }
             )
         ) {
+            val duration by sharedViewModel.currentDuration.collectAsStateWithLifecycle()
+            val totalDuration by sharedViewModel.totalDuration.collectAsStateWithLifecycle()
+
             PlaySongRoute(
                 onNavigation = {
                     IconButton(
@@ -72,7 +80,11 @@ fun NavigationGraph(
                             contentDescription = "Back Arrow"
                         )
                     }
-                }
+                },
+                selectedSongState = currentSelectedSong,
+                onSongEvents = sharedViewModel::onPlaySongEvents,
+                duration = duration,
+                totalDuration = totalDuration,
             )
         }
     }

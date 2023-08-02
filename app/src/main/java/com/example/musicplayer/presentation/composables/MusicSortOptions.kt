@@ -17,15 +17,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.musicplayer.presentation.util.MusicSortOrder
+import com.example.musicplayer.presentation.util.states.MusicSortState
 
 @Composable
 fun MusicSortOptions(
-    sortOrder: MusicSortOrder,
+    sortState: MusicSortState,
     onSortOrderChange: (MusicSortOrder) -> Unit,
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit = {},
@@ -34,60 +36,63 @@ fun MusicSortOptions(
     radioSelectedColor: Color = MaterialTheme.colorScheme.primary,
     radioUnselectedColor: Color = MaterialTheme.colorScheme.onSurfaceVariant
 ) {
-    Dialog(
-        onDismissRequest = onDismissRequest,
-        properties = DialogProperties(
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true
-        )
-    ) {
-        Card(
-            modifier = modifier,
-            shape = MaterialTheme.shapes.large,
-            colors = CardDefaults.cardColors(containerColor = dialogColor),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    if (sortState.isDialogOpen)
+        Dialog(
+            onDismissRequest = onDismissRequest,
+            properties = DialogProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true
+            )
         ) {
-            Column(
-                modifier = Modifier.padding(20.dp)
+            Card(
+                modifier = modifier,
+                shape = MaterialTheme.shapes.large,
+                colors = CardDefaults.cardColors(containerColor = dialogColor),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-                Text(
-                    "Pick Sort Order",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                MusicSortOrder.values().forEach { option ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .clip(MaterialTheme.shapes.medium)
-                            .clickable { onSortOrderChange(option) }
-                    ) {
-                        RadioButton(
-                            selected = sortOrder == option,
-                            onClick = { onSortOrderChange(option) },
-                            colors = RadioButtonDefaults.colors(
-                                selectedColor = radioSelectedColor,
-                                unselectedColor = radioUnselectedColor
-                            )
-                        )
-                        Text(
-                            text = option.text,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = textColor
-                        )
-                    }
+                Column(
+                    modifier = Modifier.padding(20.dp)
+                ) {
+                    Text(
+                        "Pick Sort Order",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    MusicSortOrder.values()
+                        .forEach { option ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .clip(MaterialTheme.shapes.medium)
+                                    .clickable { onSortOrderChange(option) }
+                            ) {
+                                RadioButton(
+                                    selected = sortState.sortOrder == option,
+                                    onClick = { onSortOrderChange(option) },
+                                    colors = RadioButtonDefaults.colors(
+                                        selectedColor = radioSelectedColor,
+                                        unselectedColor = radioUnselectedColor
+                                    )
+                                )
+                                Text(
+                                    text = option.text,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = textColor
+                                )
+                            }
+                        }
                 }
             }
         }
-    }
 }
 
 @Preview
 @Composable
 fun MusicSortOptionsPreview() {
     MusicSortOptions(
-        sortOrder = MusicSortOrder.CreatedAtDescending,
+        sortState = MusicSortState(isDialogOpen = true),
         onSortOrderChange = {}
     )
 }

@@ -1,4 +1,4 @@
-package com.example.musicplayer.presentation.util
+package com.example.musicplayer.presentation.util.preview
 
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import com.example.musicplayer.domain.models.MusicResourceModel

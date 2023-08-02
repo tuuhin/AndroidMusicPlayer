@@ -1,19 +1,12 @@
 package com.example.musicplayer.presentation.routes
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,19 +17,22 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Density
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import com.example.musicplayer.R
 import com.example.musicplayer.domain.models.MusicResourceModel
 import com.example.musicplayer.presentation.composables.MusicCardBasic
 import com.example.musicplayer.presentation.composables.MusicPlayerBar
 import com.example.musicplayer.presentation.composables.MusicSortOptions
-import com.example.musicplayer.presentation.util.FakeMusicModels
-import com.example.musicplayer.presentation.util.MusicSortOrder
-import com.example.musicplayer.presentation.util.SelectSongEvents
-import com.example.musicplayer.presentation.util.SelectedSongState
-import com.example.musicplayer.presentation.util.SortOrderChangeEvents
+import com.example.musicplayer.presentation.util.preview.FakeMusicModels
+import com.example.musicplayer.presentation.util.states.MusicSortState
+import com.example.musicplayer.presentation.util.states.SongEvents
+import com.example.musicplayer.presentation.util.states.CurrentSelectedSongState
+import com.example.musicplayer.presentation.util.states.ChangeSortOrderEvents
+import com.example.musicplayer.ui.theme.MusicPlayerTheme
 
 @OptIn(
     ExperimentalMaterial3Api::class,
@@ -44,14 +40,13 @@ import com.example.musicplayer.presentation.util.SortOrderChangeEvents
 )
 @Composable
 fun AudioFilesRoute(
-    isDialogOpen: Boolean,
-    sortOrder: MusicSortOrder,
-    onSortEvents: (SortOrderChangeEvents) -> Unit,
-    currentSelectedSong: SelectedSongState,
+    sortState: MusicSortState,
+    onSortEvents: (ChangeSortOrderEvents) -> Unit,
+    currentSong: CurrentSelectedSongState,
     music: List<MusicResourceModel>,
     onItemSelect: (MusicResourceModel) -> Unit,
-    onPlayEvents: (SelectSongEvents) -> Unit,
-    density: Density = LocalDensity.current
+    onSongEvents: (SongEvents) -> Unit,
+    onDetailsRoute: (String) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -64,44 +59,37 @@ fun AudioFilesRoute(
                 },
                 actions = {
                     IconButton(
-                        onClick = { onSortEvents(SortOrderChangeEvents.ToggleChangeSortOrderDialog) }
+                        onClick = { onSortEvents(ChangeSortOrderEvents.ToggleDialogState) }
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.MoreVert,
-                            contentDescription = "Sort Order"
+                            painter = painterResource(id = R.drawable.ic_sort_order),
+                            contentDescription = "Sort Order",
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
             )
         },
         bottomBar = {
-            AnimatedVisibility(
-                visible = currentSelectedSong.showBottomBar,
-                enter = slideInVertically(tween(400)) {
-                    with(density) { 60.dp.roundToPx() }
-                } + fadeIn(initialAlpha = 0.3f),
-                exit = slideOutVertically(tween(400)) {
-                    with(density) { 60.dp.roundToPx() }
-                } + fadeOut()
-            ) {
-                MusicPlayerBar(
-                    currentSelectedSong = currentSelectedSong,
-                    onPlayPause = onPlayEvents,
-                )
-            }
+            MusicPlayerBar(
+                currentSong = currentSong,
+                onSongEvents = onSongEvents,
+                modifier = Modifier.clickable {
+                    currentSong.current?.uri?.let { uri -> onDetailsRoute(uri) }
+                }
+            )
         }
     ) { paddingValues ->
 
-        if (isDialogOpen)
-            MusicSortOptions(
-                sortOrder = sortOrder,
-                onSortOrderChange = { order ->
-                    onSortEvents(SortOrderChangeEvents.OnOrderChanged(order))
-                },
-                onDismissRequest = {
-                    onSortEvents(SortOrderChangeEvents.ToggleChangeSortOrderDialog)
-                }
-            )
+        MusicSortOptions(
+            sortState = sortState,
+            onSortOrderChange = { order ->
+                onSortEvents(ChangeSortOrderEvents.OnOrderChanged(order))
+            },
+            onDismissRequest = {
+                onSortEvents(ChangeSortOrderEvents.ToggleDialogState)
+            }
+        )
 
         LazyColumn(
             contentPadding = paddingValues,
@@ -124,21 +112,35 @@ fun AudioFilesRoute(
     }
 }
 
-@Preview
-@Composable
-fun AudioFilesRoutePreview() {
-    AudioFilesRoute(
-        currentSelectedSong = SelectedSongState(),
-        music = List(10) {
-            FakeMusicModels.fakeMusicResourceModel.copy(id = it.toLong())
-        },
-        onItemSelect = {},
-        sortOrder = MusicSortOrder.CreatedAtDescending,
-        isDialogOpen = false,
-        onSortEvents = {},
-        onPlayEvents = {
 
-        }
+class CurrentSongPreviewParams : CollectionPreviewParameterProvider<CurrentSelectedSongState>(
+    listOf(
+        CurrentSelectedSongState(),
+        CurrentSelectedSongState(
+            showBottomBar = true,
+            current = FakeMusicModels.fakeMusicResourceModel
+        )
     )
+)
 
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
+@Composable
+fun AudioFilesRoutePreview(
+    @PreviewParameter(CurrentSongPreviewParams::class)
+    currentSong: CurrentSelectedSongState
+) {
+    MusicPlayerTheme {
+        AudioFilesRoute(
+            currentSong = currentSong,
+            music = List(10) {
+                FakeMusicModels.fakeMusicResourceModel.copy(id = it.toLong())
+            },
+            onItemSelect = {},
+            sortState = MusicSortState(),
+            onSortEvents = {},
+            onSongEvents = {},
+            onDetailsRoute = {}
+        )
+    }
 }

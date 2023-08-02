@@ -1,4 +1,4 @@
-package com.example.musicplayer.presentation.util
+package com.example.musicplayer.presentation.util.preview
 
 import com.example.musicplayer.domain.models.MusicResourceModel
 

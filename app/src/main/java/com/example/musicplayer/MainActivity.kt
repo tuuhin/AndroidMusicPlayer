@@ -20,13 +20,16 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-
     @Inject
     lateinit var listenableFuture: ListenableFuture<MediaController>
 
-    override fun onStop() {
+    override fun onDestroy() {
+        // According to docs this should be released in the onStop lifecycle
+        // But releasing the future ,we cannot get the media controller
+        // as we are not initializing it on onStart but injecting it in ActivityRetainedScope
+        // so releasing it here
         MediaController.releaseFuture(listenableFuture)
-        super.onStop()
+        super.onDestroy()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -21,25 +21,31 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.example.musicplayer.domain.models.MusicResourceModel
-import com.example.musicplayer.presentation.util.SongPreviewParameters
-import com.example.musicplayer.presentation.util.formatTimeFromLong
+import com.example.musicplayer.presentation.util.preview.SongPreviewParameters
+import com.example.musicplayer.presentation.util.rememberFormattedTimeFromLong
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MusicCardBasic(
     music: MusicResourceModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    cardColor: Color = MaterialTheme.colorScheme.inverseOnSurface
 ) {
-    val duration = formatTimeFromLong(time = music.duration)
+    val duration = rememberFormattedTimeFromLong(time = music.duration)
     OutlinedCard(
         modifier = modifier,
         shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.elevatedCardElevation(
+            defaultElevation = 4.dp,
+            pressedElevation = 8.dp
+        ),
+        colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
         Row(
             modifier = Modifier
@@ -127,5 +133,6 @@ fun MusicCardSimplePreview(
     @PreviewParameter(SongPreviewParameters::class)
     songs: MusicResourceModel
 ) {
-    MusicCardBasic(music = songs)
+
+        MusicCardBasic(music = songs)
 }

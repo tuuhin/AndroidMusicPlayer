@@ -11,7 +11,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun formatTimeFromLong(time: Long): String {
+fun rememberFormattedTimeFromLong(time: Long): String {
     val localtime by remember(time) {
         derivedStateOf {
             val dateTime = Instant.ofEpochMilli(time)
@@ -27,6 +27,6 @@ fun formatTimeFromLong(time: Long): String {
 @Preview
 @Composable
 fun TimeFormatPreview() {
-    val time = formatTimeFromLong(time = 1000L)
+    val time = rememberFormattedTimeFromLong(time = 1000L)
     Text(text = time)
 }

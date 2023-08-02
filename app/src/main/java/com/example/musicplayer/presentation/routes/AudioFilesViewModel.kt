@@ -5,7 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.musicplayer.domain.models.MusicResourceModel
 import com.example.musicplayer.domain.music.MusicFileReader
 import com.example.musicplayer.presentation.util.MusicSortOrder
-import com.example.musicplayer.presentation.util.SortOrderChangeEvents
+import com.example.musicplayer.presentation.util.states.ChangeSortOrderEvents
+import com.example.musicplayer.presentation.util.states.MusicSortState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,28 +23,26 @@ class AudioFilesViewModel @Inject constructor(
     private val _files = MutableStateFlow<List<MusicResourceModel>>(emptyList())
     val audioFiles = _files.asStateFlow()
 
-    private val _sortOrder = MutableStateFlow(MusicSortOrder.CreatedAtDescending)
-    val sortOrder = _sortOrder.asStateFlow()
-
-    private val _isDialogOpen = MutableStateFlow(false)
-    val isDialogOpen = _isDialogOpen.asStateFlow()
+    private val _sortState = MutableStateFlow(MusicSortState())
+    val sortState = _sortState.asStateFlow()
 
     init {
         loadFiles()
     }
 
 
-    fun onSortEvents(events: SortOrderChangeEvents) {
+    fun onSortEvents(events: ChangeSortOrderEvents) {
         when (events) {
-            is SortOrderChangeEvents.OnOrderChanged -> onSortOrderChanged(events.order)
-            SortOrderChangeEvents.ToggleChangeSortOrderDialog -> onToggleSortDialog()
+            is ChangeSortOrderEvents.OnOrderChanged -> onSortOrderChanged(events.order)
+            ChangeSortOrderEvents.ToggleDialogState -> onToggleSortDialog()
         }
     }
 
-    private fun onToggleSortDialog() = _isDialogOpen.update { !_isDialogOpen.value }
+    private fun onToggleSortDialog() =
+        _sortState.update { it.copy(isDialogOpen = !it.isDialogOpen) }
 
     private fun onSortOrderChanged(order: MusicSortOrder) {
-        _sortOrder.update { order }
+        _sortState.update { it.copy(sortOrder = order) }
         when (order) {
             MusicSortOrder.AscendingByDuration -> _files.update { files ->
 
@@ -70,5 +69,4 @@ class AudioFilesViewModel @Inject constructor(
             _files.update { files }
         }
     }
-
 }
