@@ -1,8 +1,8 @@
 package com.example.musicplayer.data.player
 
-import android.util.Log
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
+import com.example.musicplayer.presentation.util.MusicTrackData
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -24,17 +24,17 @@ class MediaControllerListener(
     private val _repeatMode = MutableStateFlow(Player.REPEAT_MODE_OFF)
     val isRepeatModeActive = _repeatMode.asStateFlow()
 
-    fun playerDurationAsFlow(): Flow<Long> {
+
+    fun playerDurationAsFlow(): Flow<MusicTrackData> {
         return flow {
             val controller = futureController.await()
-            val checkIfDurationNeeded = controller.playbackState != Player.STATE_ENDED
-            Log.d("CHECK", checkIfDurationNeeded.toString())
+            val checkIfDurationNeeded =
+                controller.playWhenReady && controller.playbackState != Player.STATE_ENDED
             while (checkIfDurationNeeded) {
                 delay(1.seconds)
-                val duration = controller.totalBufferedDuration
-                Log.d(
-                    "DURATION",
-                    "${controller.totalBufferedDuration} ${controller.contentDuration}"
+                val duration = MusicTrackData(
+                    current = controller.currentPosition.toFloat(),
+                    duration = controller.duration.toFloat()
                 )
                 emit(duration)
             }
