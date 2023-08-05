@@ -3,6 +3,8 @@ package com.example.musicplayer.data.music
 import android.Manifest
 import android.content.ContentUris
 import android.content.Context
+import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
 import android.os.Build
 import android.provider.MediaStore
 import androidx.core.content.ContextCompat
@@ -104,6 +106,24 @@ class MusicFileReaderImpl(
 
                             val dateAdded = cursor.getLong(dateAddedColumn)
 
+                            val mediaMetadataReader = MediaMetadataRetriever()
+                                .apply {
+                                    setDataSource(
+                                        context,
+                                        ContentUris.withAppendedId(volumeUri, id)
+                                    )
+                                }
+
+                            val albumArt = try {
+                                mediaMetadataReader.embeddedPicture?.let { array ->
+                                    BitmapFactory.decodeByteArray(array, 0, array.size)
+                                }
+                            } catch (e: Exception) {
+                                null
+                            } finally {
+                                mediaMetadataReader.release()
+                            }
+
                             musicFiles.add(
                                 MusicResourceModel(
                                     title = title,
@@ -113,7 +133,7 @@ class MusicFileReaderImpl(
                                     album = album,
                                     duration = duration,
                                     uri = uriString,
-                                    albumArt = null,
+                                    albumArt = albumArt,
                                     createdAt = dateAdded
                                 )
                             )

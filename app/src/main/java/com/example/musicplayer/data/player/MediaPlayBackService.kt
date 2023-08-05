@@ -12,7 +12,6 @@ import androidx.media3.session.MediaSessionService
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-@UnstableApi
 @AndroidEntryPoint
 class MediaPlayBackService : MediaSessionService() {
 
@@ -48,9 +47,7 @@ class MediaPlayBackService : MediaSessionService() {
 
         exoPlayer.addListener(playerListener)
 
-        setMediaNotificationProvider(
-            MediaSessionCommands.defaultNotificationProvider(this)
-        )
+        setMediaNotificationProvider(MediaNotificationProvider(this))
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession {
