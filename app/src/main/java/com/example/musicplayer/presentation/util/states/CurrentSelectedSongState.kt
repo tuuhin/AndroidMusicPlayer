@@ -13,4 +13,10 @@ sealed interface SongEvents {
     object ToggleIsPlaying : SongEvents
 
     object ToggleIsRepeating : SongEvents
+
+    object ForwardCurrentMedia : SongEvents
+
+    object RewindCurrentMedia : SongEvents
+
+    data class OnTrackPositionChange(val pos: Float) : SongEvents
 }

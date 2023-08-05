@@ -15,30 +15,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.musicplayer.R
+import com.example.musicplayer.ui.theme.MusicPlayerTheme
 
 @Composable
 fun MusicAlbumArt(
     modifier: Modifier = Modifier,
     albumArt: Bitmap? = null,
     internalPadding: PaddingValues = PaddingValues(8.dp),
+    elevation: Dp = 2.dp,
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
-    contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer
+    contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
+    shape: Shape = MaterialTheme.shapes.medium
 ) {
-    Box(
-        modifier = modifier
-            .aspectRatio(1f),
-        contentAlignment = Alignment.Center
+    Surface(
+        shadowElevation = elevation,
+        shape = shape,
+        modifier = modifier.aspectRatio(1f)
     ) {
         albumArt?.let { bitmap ->
             Image(
                 bitmap = bitmap.asImageBitmap(),
                 contentDescription = "Album Image",
-                modifier = Modifier.clip(MaterialTheme.shapes.medium)
+                contentScale = ContentScale.FillBounds
             )
         } ?: Box(
             modifier = Modifier
@@ -60,9 +66,14 @@ fun MusicAlbumArt(
 @Preview
 @Composable
 fun MusicAlbumArtPreview() {
-    Surface(
-        color = MaterialTheme.colorScheme.surfaceVariant
-    ) {
-        MusicAlbumArt(modifier = Modifier.padding(4.dp))
+    MusicPlayerTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.background,
+            shape = MaterialTheme.shapes.medium
+        ) {
+            MusicAlbumArt(
+                modifier = Modifier.padding(20.dp)
+            )
+        }
     }
 }

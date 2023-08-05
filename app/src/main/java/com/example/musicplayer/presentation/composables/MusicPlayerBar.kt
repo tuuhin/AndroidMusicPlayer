@@ -14,9 +14,6 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Pause
-import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,10 +32,10 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.musicplayer.R
-import com.example.musicplayer.domain.models.MusicResourceModel
+import com.example.musicplayer.presentation.util.preview.CurrentSongPreviewParams
 import com.example.musicplayer.presentation.util.states.SongEvents
 import com.example.musicplayer.presentation.util.states.CurrentSelectedSongState
-import com.example.musicplayer.presentation.util.preview.SongPreviewParameters
+import com.example.musicplayer.ui.theme.MusicPlayerTheme
 
 @Composable
 fun MusicPlayerBar(
@@ -59,15 +56,15 @@ fun MusicPlayerBar(
         enter = slideInVertically { with(density) { 60.dp.roundToPx() } }
                 + fadeIn(initialAlpha = 0.3f),
         exit = slideOutVertically { with(density) { 60.dp.roundToPx() } }
-                + fadeOut()
+                + fadeOut(), modifier = Modifier.clip(
+            RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+        )
     ) {
         BottomAppBar(
-            modifier = modifier.clip(
-                RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-            ),
+            modifier = modifier,
             windowInsets = WindowInsets.navigationBars,
-            contentPadding = PaddingValues(4.dp),
             containerColor = containerColor,
+            contentPadding = PaddingValues(4.dp),
             contentColor = contentColor,
             tonalElevation = tonalElevation
         ) {
@@ -91,35 +88,38 @@ fun MusicPlayerBar(
                     colors = IconButtonDefaults
                         .outlinedIconButtonColors(contentColor = contentColor),
                 ) {
-                    if (currentSong.isRepeating)
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_loop),
+                    when {
+                        currentSong.isRepeating -> Icon(
+                            painter = painterResource(id = R.drawable.ic_repeat),
                             contentDescription = "Repeating",
                             modifier = Modifier.size(28.dp)
                         )
-                    else Icon(
-                        painter = painterResource(id = R.drawable.ic_no_repeat),
-                        contentDescription = "Not repeating",
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
 
+                        else -> Icon(
+                            painter = painterResource(id = R.drawable.ic_no_repeat),
+                            contentDescription = "Not repeating",
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                }
                 IconButton(
                     onClick = { onSongEvents(SongEvents.ToggleIsPlaying) },
                     colors = IconButtonDefaults
                         .outlinedIconButtonColors(contentColor = contentColor),
                 ) {
-                    if (currentSong.isPlaying)
-                        Icon(
-                            imageVector = Icons.Outlined.Pause,
+                    when {
+                        currentSong.isPlaying -> Icon(
+                            painter = painterResource(id = R.drawable.ic_pause),
                             contentDescription = "Pause",
                             modifier = Modifier.size(32.dp)
                         )
-                    else Icon(
-                        imageVector = Icons.Outlined.PlayArrow,
-                        contentDescription = "Play Current",
-                        modifier = Modifier.size(32.dp)
-                    )
+
+                        else -> Icon(
+                            painter = painterResource(id = R.drawable.ic_play),
+                            contentDescription = "Play Current",
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
                 }
             }
         }
@@ -129,14 +129,13 @@ fun MusicPlayerBar(
 @Preview
 @Composable
 fun MusicPlayerBarPreview(
-    @PreviewParameter(SongPreviewParameters::class)
-    song: MusicResourceModel
+    @PreviewParameter(CurrentSongPreviewParams::class)
+    song: CurrentSelectedSongState
 ) {
-    MusicPlayerBar(
-        currentSong = CurrentSelectedSongState(
-            current = song,
-            showBottomBar = true
-        ),
-        onSongEvents = {},
-    )
+    MusicPlayerTheme {
+        MusicPlayerBar(
+            currentSong = song,
+            onSongEvents = {},
+        )
+    }
 }

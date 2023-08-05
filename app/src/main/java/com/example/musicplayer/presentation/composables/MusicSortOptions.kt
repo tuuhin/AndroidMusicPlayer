@@ -1,16 +1,16 @@
 package com.example.musicplayer.presentation.composables
 
+import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,6 +24,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.musicplayer.presentation.util.MusicSortOrder
 import com.example.musicplayer.presentation.util.states.MusicSortState
+import com.example.musicplayer.ui.theme.MusicPlayerTheme
 
 @Composable
 fun MusicSortOptions(
@@ -44,11 +45,11 @@ fun MusicSortOptions(
                 dismissOnClickOutside = true
             )
         ) {
-            Card(
+            Surface(
                 modifier = modifier,
                 shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(containerColor = dialogColor),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                color = dialogColor,
+                tonalElevation = 6.dp
             ) {
                 Column(
                     modifier = Modifier.padding(20.dp)
@@ -89,10 +90,13 @@ fun MusicSortOptions(
 }
 
 @Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
 @Composable
 fun MusicSortOptionsPreview() {
-    MusicSortOptions(
-        sortState = MusicSortState(isDialogOpen = true),
-        onSortOrderChange = {}
-    )
+    MusicPlayerTheme {
+        MusicSortOptions(
+            sortState = MusicSortState(isDialogOpen = true),
+            onSortOrderChange = {}
+        )
+    }
 }

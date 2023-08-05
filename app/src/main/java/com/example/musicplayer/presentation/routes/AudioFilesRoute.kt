@@ -1,9 +1,9 @@
 package com.example.musicplayer.presentation.routes
 
-import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -14,19 +14,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.example.musicplayer.R
 import com.example.musicplayer.domain.models.MusicResourceModel
 import com.example.musicplayer.presentation.composables.MusicCardBasic
 import com.example.musicplayer.presentation.composables.MusicPlayerBar
 import com.example.musicplayer.presentation.composables.MusicSortOptions
+import com.example.musicplayer.presentation.util.preview.CurrentSongPreviewParams
 import com.example.musicplayer.presentation.util.preview.FakeMusicModels
 import com.example.musicplayer.presentation.util.states.MusicSortState
 import com.example.musicplayer.presentation.util.states.SongEvents
@@ -53,7 +55,7 @@ fun AudioFilesRoute(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Your Audio Files",
+                        text = stringResource(id = R.string.audio_route_title),
                         style = MaterialTheme.typography.headlineSmall
                     )
                 },
@@ -67,7 +69,12 @@ fun AudioFilesRoute(
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.smallTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             )
         },
         bottomBar = {
@@ -90,11 +97,13 @@ fun AudioFilesRoute(
                 onSortEvents(ChangeSortOrderEvents.ToggleDialogState)
             }
         )
-
         LazyColumn(
-            contentPadding = paddingValues,
+            contentPadding = PaddingValues(
+                top = paddingValues.calculateTopPadding() + 10.dp,
+                bottom = paddingValues.calculateBottomPadding()
+            ),
             verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier.padding(horizontal = 10.dp)
+            modifier = Modifier.padding(horizontal = 10.dp),
         ) {
             itemsIndexed(
                 music,
@@ -113,18 +122,7 @@ fun AudioFilesRoute(
 }
 
 
-class CurrentSongPreviewParams : CollectionPreviewParameterProvider<CurrentSelectedSongState>(
-    listOf(
-        CurrentSelectedSongState(),
-        CurrentSelectedSongState(
-            showBottomBar = true,
-            current = FakeMusicModels.fakeMusicResourceModel
-        )
-    )
-)
-
 @Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
 @Composable
 fun AudioFilesRoutePreview(
     @PreviewParameter(CurrentSongPreviewParams::class)

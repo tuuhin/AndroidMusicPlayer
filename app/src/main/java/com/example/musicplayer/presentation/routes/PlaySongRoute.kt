@@ -5,25 +5,22 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Album
 import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Pause
-import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,9 +31,11 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.example.musicplayer.domain.models.MusicResourceModel
 import com.example.musicplayer.presentation.composables.MusicAlbumArt
+import com.example.musicplayer.presentation.composables.SongPlayerControls
+import com.example.musicplayer.presentation.composables.SongPlayerSlider
+import com.example.musicplayer.presentation.util.MusicTrackData
 import com.example.musicplayer.presentation.util.preview.FakeMusicModels
 import com.example.musicplayer.presentation.util.preview.SongPreviewParameters
-import com.example.musicplayer.presentation.util.rememberFormattedTimeFromLong
 import com.example.musicplayer.presentation.util.states.CurrentSelectedSongState
 import com.example.musicplayer.presentation.util.states.SongEvents
 import com.example.musicplayer.ui.theme.MusicPlayerTheme
@@ -46,43 +45,47 @@ import com.example.musicplayer.ui.theme.MusicPlayerTheme
 fun PlaySongRoute(
     modifier: Modifier = Modifier,
     onSongEvents: (SongEvents) -> Unit,
-    selectedSongState: CurrentSelectedSongState,
-    totalDuration: Long,
-    duration: Long,
+    songState: CurrentSelectedSongState,
+    trackData: MusicTrackData,
     onNavigation: (@Composable () -> Unit)? = null,
 ) {
-
-    val formattedTotalDuration = rememberFormattedTimeFromLong(time = totalDuration)
-    val formattedDuration = rememberFormattedTimeFromLong(time = duration)
-
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { },
-                navigationIcon = onNavigation ?: {}
+                navigationIcon = onNavigation ?: {},
+                colors = TopAppBarDefaults.smallTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             )
         }
-    ) { paddingValues ->
+    ) { scPadding ->
         Column(
             modifier = modifier
-                .padding(paddingValues)
+                .padding(scPadding)
                 .fillMaxSize()
-                .padding(horizontal = 20.dp),
+                .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            selectedSongState.current?.let { song ->
+            songState.current?.let { song ->
                 MusicAlbumArt(
-                    internalPadding = PaddingValues(20.dp)
+                    internalPadding = PaddingValues(20.dp),
+                    albumArt = song.albumArt,
+                    elevation = 8.dp,
+                    modifier = Modifier.fillMaxWidth(.75f)
                 )
                 Text(
                     text = song.title,
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    textAlign = TextAlign.Center
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = 12.dp)
                 )
                 song.artist?.let { artist ->
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
@@ -101,7 +104,7 @@ fun PlaySongRoute(
                 }
                 song.album?.let { album ->
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
@@ -118,46 +121,21 @@ fun PlaySongRoute(
                         )
                     }
                 }
-
-                Slider(
-                    value = 0.5f,
-                    onValueChange = {},
-                    colors = SliderDefaults.colors(
-                        inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
-                    )
+                Spacer(modifier = Modifier.height(12.dp))
+                SongPlayerSlider(
+                    duration = trackData.duration,
+                    current = trackData.current,
+                    ratio = trackData.ratio,
+                    onSliderValueChange = { position ->
+                        onSongEvents(SongEvents.OnTrackPositionChange(position))
+                    }
                 )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = formattedDuration,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                    Text(
-                        text = formattedTotalDuration,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-
-                }
-                FloatingActionButton(
-                    onClick = { onSongEvents(SongEvents.ToggleIsPlaying) },
-                    elevation = FloatingActionButtonDefaults
-                        .elevation(defaultElevation = 0.dp, pressedElevation = 4.dp)
-                ) {
-                    if (selectedSongState.isPlaying)
-                        Icon(
-                            imageVector = Icons.Outlined.Pause,
-                            contentDescription = "Pause Current Song"
-                        )
-                    else
-                        Icon(
-                            imageVector = Icons.Outlined.PlayArrow,
-                            contentDescription = "Play now"
-                        )
-                }
+                SongPlayerControls(
+                    isRepeating = songState.isRepeating,
+                    isPlaying = songState.isPlaying,
+                    onSongEvents = onSongEvents,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }
@@ -178,11 +156,9 @@ fun PlaySongRoutePreview(
                     contentDescription = "Back Arrow"
                 )
             },
-            selectedSongState = CurrentSelectedSongState(
-                current = FakeMusicModels.fakeMusicResourceModel
-            ),
-            totalDuration = 18000L,
-            duration = 0L, onSongEvents = {}
+            songState = CurrentSelectedSongState(current = FakeMusicModels.fakeMusicResourceModel),
+            trackData = MusicTrackData(current = 0f, duration = 1800f),
+            onSongEvents = {}
         )
     }
 }

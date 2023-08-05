@@ -1,5 +1,6 @@
 package com.example.musicplayer.presentation.composables
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -29,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.example.musicplayer.domain.models.MusicResourceModel
 import com.example.musicplayer.presentation.util.preview.SongPreviewParameters
 import com.example.musicplayer.presentation.util.rememberFormattedTimeFromLong
+import com.example.musicplayer.ui.theme.MusicPlayerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,7 +60,9 @@ fun MusicCardBasic(
             MusicAlbumArt(
                 modifier = Modifier.weight(.2f),
                 albumArt = music.albumArt,
-                internalPadding = PaddingValues(16.dp)
+                internalPadding = PaddingValues(16.dp),
+                shape = MaterialTheme.shapes.small,
+                elevation = 2.dp
             )
             Column(
                 modifier = Modifier
@@ -118,7 +123,8 @@ fun MusicCardBasic(
                         text = duration,
                         modifier = Modifier
                             .padding(4.dp),
-                        style = MaterialTheme.typography.labelMedium
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             }
@@ -128,11 +134,13 @@ fun MusicCardBasic(
 
 
 @Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
 @Composable
 fun MusicCardSimplePreview(
     @PreviewParameter(SongPreviewParameters::class)
     songs: MusicResourceModel
 ) {
-
+    MusicPlayerTheme {
         MusicCardBasic(music = songs)
+    }
 }

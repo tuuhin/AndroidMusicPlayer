@@ -20,6 +20,7 @@ class MyApplication : Application() {
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
             description = NotificationConstants.NOTIFICATION_CHANNEL_DESC
+            setSound(null, null)
         }
 
         notificationManager?.createNotificationChannel(channel)

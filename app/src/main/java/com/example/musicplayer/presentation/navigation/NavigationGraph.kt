@@ -64,8 +64,7 @@ fun NavigationGraph(
                 }
             )
         ) {
-            val duration by sharedViewModel.currentDuration.collectAsStateWithLifecycle()
-            val totalDuration by sharedViewModel.totalDuration.collectAsStateWithLifecycle()
+            val trackData by sharedViewModel.trackDataFlow.collectAsStateWithLifecycle()
 
             PlaySongRoute(
                 onNavigation = {
@@ -81,10 +80,9 @@ fun NavigationGraph(
                         )
                     }
                 },
-                selectedSongState = currentSelectedSong,
+                songState = currentSelectedSong,
                 onSongEvents = sharedViewModel::onPlaySongEvents,
-                duration = duration,
-                totalDuration = totalDuration,
+                trackData = trackData
             )
         }
     }

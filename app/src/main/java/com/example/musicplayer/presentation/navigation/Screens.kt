@@ -2,7 +2,7 @@ package com.example.musicplayer.presentation.navigation
 
 sealed class Screens(val route: String) {
     object HomeRoute : Screens("/")
-    object SongRoute : Screens("/play-song/{music-uri}")
+    object SongRoute : Screens("/play-song/{${ScreenConstants.PLAY_SONG_ROUTE_PARAM}}")
 }
 
 object ScreenConstants {

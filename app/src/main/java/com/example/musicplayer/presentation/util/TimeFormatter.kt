@@ -23,6 +23,19 @@ fun rememberFormattedTimeFromLong(time: Long): String {
     }
     return localtime
 }
+@Composable
+fun rememberFormattedTimeFromLong(time: Float): String {
+    val localtime by remember(time) {
+        derivedStateOf {
+            val dateTime = Instant.ofEpochMilli(time.toLong())
+                .atZone(ZoneId.of("Europe/London"))
+                .toLocalTime()
+            val formatter = DateTimeFormatter.ofPattern("mm:ss")
+            dateTime.format(formatter)
+        }
+    }
+    return localtime
+}
 
 @Preview
 @Composable
